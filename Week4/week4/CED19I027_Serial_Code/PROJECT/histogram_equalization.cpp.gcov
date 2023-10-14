@@ -1,0 +1,392 @@
+        -:    0:Source:histogram_equalization.cpp
+        -:    0:Graph:histogram_equalization.gcno
+        -:    0:Data:histogram_equalization.gcda
+        -:    0:Runs:1
+        -:    1:#include <iostream>
+        -:    2:#include <fstream>
+        -:    3:#include <sstream>
+        -:    4:#include <math.h>
+        -:    5:#include <vector>
+        -:    6:
+        -:    7:using namespace std;
+        -:    8:
+        -:    9:int array[1000][1000];
+        -:   10:int arr[1000][1000];
+        -:   11:vector<int> pf;
+        -:   12:vector<float> pr;
+        -:   13:vector<float> cpr;
+        -:   14:vector<int> fin;
+        -:   15:
+        -:   16:// Function that creates a frequency array of pixels in the image
+function _Z22create_frequency_arrayii called 1 returned 100% blocks executed 100%
+        1:   17:vector<int> create_frequency_array(int numrows, int numcols){
+      258:   18:    for(int i = 0; i < 257; i++){
+branch  0 taken 257 (fallthrough)
+branch  1 taken 1
+      257:   19:        pf.push_back(0);
+call    0 returned 257
+branch  1 taken 257 (fallthrough)
+branch  2 taken 0 (throw)
+        -:   20:    }
+        -:   21:    
+      361:   22:    for(int row = 1; row <= numrows; row++){
+branch  0 taken 360 (fallthrough)
+branch  1 taken 1
+   165960:   23:        for(int col = 1; col <= numcols; col++){
+branch  0 taken 165600 (fallthrough)
+branch  1 taken 360
+   165600:   24:	    pf[256]++;
+call    0 returned 165600
+   165600:   25:	    pf[array[row][col]]++;
+call    0 returned 165600
+        -:   26:	}
+        -:   27:    }
+        1:   28:    return pf;  
+call    0 returned 1
+        -:   29:}
+        -:   30:
+        -:   31:// Function to find individual probabilities of occurence of each of 256 values of pixel
+function _Z24individual_probabilitiesSt6vectorIiSaIiEEi called 1 returned 100% blocks executed 100%
+        1:   32:vector<float> individual_probabilities(vector<int> pixel_frequency, int num_pixels){
+      257:   33:    for(int i = 0; i < 256; i++){
+branch  0 taken 256 (fallthrough)
+branch  1 taken 1
+      256:   34:        pr.push_back(0);
+call    0 returned 256
+branch  1 taken 256 (fallthrough)
+branch  2 taken 0 (throw)
+        -:   35:    }
+        -:   36:    
+      257:   37:    for(int i = 0; i < 256; i++){
+branch  0 taken 256 (fallthrough)
+branch  1 taken 1
+      256:   38:        pr[i] = ((float)pixel_frequency[i])/((float)num_pixels);
+call    0 returned 256
+call    1 returned 256
+        -:   39:    }
+        -:   40:    
+        1:   41:    return pr;
+call    0 returned 1
+        -:   42:}
+        -:   43:
+        -:   44:// Function to find cumulative probability of each of 256 values of pixel
+function _Z22cumulative_probabilitySt6vectorIfSaIfEE called 1 returned 100% blocks executed 100%
+        1:   45:vector<float> cumulative_probability(vector<float> pr){
+        -:   46:    
+      257:   47:    for(int i = 0; i < 256; i++){
+branch  0 taken 256 (fallthrough)
+branch  1 taken 1
+      256:   48:        cpr.push_back(0);
+call    0 returned 256
+branch  1 taken 256 (fallthrough)
+branch  2 taken 0 (throw)
+        -:   49:    }
+        -:   50:    
+        1:   51:    cpr[0] = pr[0];
+call    0 returned 1
+call    1 returned 1
+      256:   52:    for(int i = 1; i < 256; i++){
+branch  0 taken 255 (fallthrough)
+branch  1 taken 1
+      255:   53:        cpr[i] = pr[i] + cpr[i-1];
+call    0 returned 255
+call    1 returned 255
+call    2 returned 255
+        -:   54:    }
+        1:   55:    return cpr;
+call    0 returned 1
+        -:   56:}
+        -:   57:
+        -:   58:// Function to calculate C(r) X (L-1)
+function _Z18cpr_into_max_pixelSt6vectorIfSaIfEE called 1 returned 100% blocks executed 100%
+        1:   59:vector<int> cpr_into_max_pixel(vector<float> cpr){
+      257:   60:    for(int i = 0; i < 256; i++){
+branch  0 taken 256 (fallthrough)
+branch  1 taken 1
+      256:   61:        fin.push_back(0);
+call    0 returned 256
+branch  1 taken 256 (fallthrough)
+branch  2 taken 0 (throw)
+        -:   62:    }
+      257:   63:    for(int i = 0; i < 256; i++){
+branch  0 taken 256 (fallthrough)
+branch  1 taken 1
+      256:   64:        fin[i] = round(cpr[i]*255);
+call    0 returned 256
+call    1 returned 256
+call    2 returned 256
+        -:   65:    }
+        1:   66:    return fin;
+call    0 returned 1
+        -:   67:}
+        -:   68:
+        -:   69:// Function to update with new pixel values
+function _Z10final_stepiiSt6vectorIiSaIiEE called 1 returned 100% blocks executed 100%
+        1:   70:void final_step(int numrows, int numcols, vector<int> finall){
+      361:   71:    for(int row = 1; row <= numrows; row++){
+branch  0 taken 360 (fallthrough)
+branch  1 taken 1
+   165960:   72:	for(int col = 1; col <= numcols; col++){
+branch  0 taken 165600 (fallthrough)
+branch  1 taken 360
+   165600:   73:	    arr[row][col] = finall[array[row][col]];
+call    0 returned 165600
+        -:   74:	}
+        -:   75:    }
+        1:   76:}
+        -:   77:
+function main called 1 returned 100% blocks executed 73%
+        1:   78:int main()
+        -:   79:{
+        1:   80:	int row = 0, col = 0, numrows = 0, numcols = 0,MAX=0;
+        2:   81:	ifstream infile("Images/casablanca.ascii.pgm");
+call    0 returned 1
+branch  1 taken 1 (fallthrough)
+branch  2 taken 0 (throw)
+call    3 returned 1
+call    4 never executed
+        2:   82:	stringstream ss;
+call    0 returned 1
+branch  1 taken 1 (fallthrough)
+branch  2 taken 0 (throw)
+call    3 returned 1
+call    4 never executed
+        2:   83:	string inputLine = "";
+call    0 returned 1
+call    1 returned 1
+branch  2 taken 1 (fallthrough)
+branch  3 taken 0 (throw)
+call    4 returned 1
+call    5 never executed
+        -:   84:
+        -:   85:	// First line : version
+        1:   86:	getline(infile,inputLine);
+call    0 returned 1
+branch  1 taken 1 (fallthrough)
+branch  2 taken 0 (throw)
+       1*:   87:	if(inputLine.compare("P2") != 0) cerr << "Version error" << endl;
+call    0 returned 1
+branch  1 taken 0 (fallthrough)
+branch  2 taken 1
+call    3 never executed
+branch  4 never executed
+branch  5 never executed
+call    6 never executed
+branch  7 never executed
+branch  8 never executed
+        1:   88:	else cout << "Version : " << inputLine << endl;
+call    0 returned 1
+branch  1 taken 1 (fallthrough)
+branch  2 taken 0 (throw)
+call    3 returned 1
+branch  4 taken 1 (fallthrough)
+branch  5 taken 0 (throw)
+call    6 returned 1
+branch  7 taken 1 (fallthrough)
+branch  8 taken 0 (throw)
+        -:   89:
+        -:   90:	// Continue with a stringstream
+        1:   91:	ss << infile.rdbuf();
+call    0 returned 1
+branch  1 taken 1 (fallthrough)
+branch  2 taken 0 (throw)
+call    3 returned 1
+branch  4 taken 1 (fallthrough)
+branch  5 taken 0 (throw)
+        -:   92:
+        -:   93:	// Secondline : size of image
+        1:   94:	ss >> numcols >> numrows >> MAX;
+call    0 returned 1
+branch  1 taken 1 (fallthrough)
+branch  2 taken 0 (throw)
+call    3 returned 1
+branch  4 taken 1 (fallthrough)
+branch  5 taken 0 (throw)
+call    6 returned 1
+branch  7 taken 1 (fallthrough)
+branch  8 taken 0 (throw)
+        -:   95:
+        -:   96:	//print total number of rows, columns and maximum intensity of image
+        1:   97:	cout << numcols << " columns and " << numrows << " rows" <<endl<<"Maximum Intensity "<< MAX <<endl;
+call    0 returned 1
+branch  1 taken 1 (fallthrough)
+branch  2 taken 0 (throw)
+call    3 returned 1
+branch  4 taken 1 (fallthrough)
+branch  5 taken 0 (throw)
+call    6 returned 1
+branch  7 taken 1 (fallthrough)
+branch  8 taken 0 (throw)
+call    9 returned 1
+branch 10 taken 1 (fallthrough)
+branch 11 taken 0 (throw)
+call   12 returned 1
+branch 13 taken 1 (fallthrough)
+branch 14 taken 0 (throw)
+call   15 returned 1
+branch 16 taken 1 (fallthrough)
+branch 17 taken 0 (throw)
+call   18 returned 1
+branch 19 taken 1 (fallthrough)
+branch 20 taken 0 (throw)
+call   21 returned 1
+branch 22 taken 1 (fallthrough)
+branch 23 taken 0 (throw)
+        -:   98:
+        -:   99:
+        -:  100:	//Initialize a new array of same size of image with 0
+      362:  101:	for(row = 0; row <= numrows; ++row){
+branch  0 taken 361 (fallthrough)
+branch  1 taken 1
+      361:  102:	    array[row][0]=0;
+        -:  103:	    //arr[row][0] = 0;
+   166782:  104:	    for(col = 0; col <= numcols; col++){
+branch  0 taken 166421 (fallthrough)
+branch  1 taken 361
+   166421:  105:	        array[0][col] = 0;
+        -:  106:	        //arr[0][col] = 0;
+        -:  107:	    }
+        -:  108:	}
+        -:  109:		
+        -:  110:	// Following lines : data
+      361:  111:	for(row = 1; row <= numrows; ++row)
+branch  0 taken 360 (fallthrough)
+branch  1 taken 1
+        -:  112:	{
+   165960:  113:		for (col = 1; col <= numcols; ++col)
+branch  0 taken 165600 (fallthrough)
+branch  1 taken 360
+        -:  114:		{
+        -:  115:			//original data store in new array
+   165600:  116:			ss >> array[row][col];
+call    0 returned 165600
+branch  1 taken 165600 (fallthrough)
+branch  2 taken 0 (throw)
+        -:  117:		}
+        -:  118:	}
+        -:  119:
+        -:  120:
+        -:  121:    // Histogram Equalization begins
+        -:  122:    
+        -:  123:	// Step 1: Find frequencies of each pixel value
+        2:  124:	vector<int> pixel_frequency = create_frequency_array(numrows, numcols);
+call    0 returned 1
+branch  1 taken 1 (fallthrough)
+branch  2 taken 0 (throw)
+call    3 returned 1
+call    4 never executed
+        1:  125:	int num_pixels = pixel_frequency[256];
+call    0 returned 1
+        -:  126:
+        -:  127:	// Step 2: P(r)
+        2:  128:	vector<float> pr = individual_probabilities(pixel_frequency, num_pixels);
+call    0 returned 1
+branch  1 taken 1 (fallthrough)
+branch  2 taken 0 (throw)
+call    3 returned 1
+branch  4 taken 1 (fallthrough)
+branch  5 taken 0 (throw)
+call    6 returned 1
+call    7 never executed
+        -:  129:
+        -:  130:	// Step 3: Cumulative Frequency
+        2:  131:	vector<float> cpr = cumulative_probability(pr);
+call    0 returned 1
+branch  1 taken 1 (fallthrough)
+branch  2 taken 0 (throw)
+call    3 returned 1
+branch  4 taken 1 (fallthrough)
+branch  5 taken 0 (throw)
+call    6 returned 1
+call    7 never executed
+        -:  132:
+        -:  133:	// Step 4: C(r) X (L-1)
+        2:  134:	vector<int> finall = cpr_into_max_pixel(cpr);
+call    0 returned 1
+branch  1 taken 1 (fallthrough)
+branch  2 taken 0 (throw)
+call    3 returned 1
+branch  4 taken 1 (fallthrough)
+branch  5 taken 0 (throw)
+call    6 returned 1
+call    7 never executed
+        -:  135:
+        -:  136:
+        -:  137:	// Step 5: Updare new image with respective updation
+        1:  138:	final_step(numrows, numcols, finall);
+call    0 returned 1
+branch  1 taken 1 (fallthrough)
+branch  2 taken 0 (throw)
+call    3 returned 1
+call    4 returned 1
+        -:  139:	
+        -:  140:
+        1:  141:	ofstream outfile;
+call    0 returned 1
+branch  1 taken 1 (fallthrough)
+branch  2 taken 0 (throw)
+call    3 never executed
+        -:  142:	
+        -:  143:	//new file open to store the output image
+        1:  144:	outfile.open("AfterHistogramEqualization.ascii.pgm");
+call    0 returned 1
+branch  1 taken 1 (fallthrough)
+branch  2 taken 0 (throw)
+        1:  145:	outfile<<"P2"<<endl;
+call    0 returned 1
+branch  1 taken 1 (fallthrough)
+branch  2 taken 0 (throw)
+call    3 returned 1
+branch  4 taken 1 (fallthrough)
+branch  5 taken 0 (throw)
+        1:  146:	outfile<<numcols<<" "<<numrows<<endl;
+call    0 returned 1
+branch  1 taken 1 (fallthrough)
+branch  2 taken 0 (throw)
+call    3 returned 1
+branch  4 taken 1 (fallthrough)
+branch  5 taken 0 (throw)
+call    6 returned 1
+branch  7 taken 1 (fallthrough)
+branch  8 taken 0 (throw)
+call    9 returned 1
+branch 10 taken 1 (fallthrough)
+branch 11 taken 0 (throw)
+        1:  147:	outfile<<"255"<<endl;
+call    0 returned 1
+branch  1 taken 1 (fallthrough)
+branch  2 taken 0 (throw)
+call    3 returned 1
+branch  4 taken 1 (fallthrough)
+branch  5 taken 0 (throw)
+        -:  148:	
+      361:  149:	for(row = 1; row <= numrows; ++row)
+branch  0 taken 360 (fallthrough)
+branch  1 taken 1
+        -:  150:	{
+   165960:  151:		for (col = 1; col <= numcols; ++col)
+branch  0 taken 165600 (fallthrough)
+branch  1 taken 360
+        -:  152:		{
+        -:  153:			//store resultant pixel values to the output file
+   165600:  154:			outfile << arr[row][col]<<" ";
+call    0 returned 165600
+branch  1 taken 165600 (fallthrough)
+branch  2 taken 0 (throw)
+call    3 returned 165600
+branch  4 taken 165600 (fallthrough)
+branch  5 taken 0 (throw)
+        -:  155:		}
+        -:  156:	}
+        -:  157:	
+        1:  158:	outfile.close();
+call    0 returned 1
+branch  1 taken 1 (fallthrough)
+branch  2 taken 0 (throw)
+        1:  159:	infile.close();
+call    0 returned 1
+branch  1 taken 1 (fallthrough)
+branch  2 taken 0 (throw)
+        1:  160:	return 0 ;
+call    0 returned 1
+        -:  161:}
